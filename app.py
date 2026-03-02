@@ -1,106 +1,98 @@
 import streamlit as st
-import requests
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
-st.set_page_config(page_title="AI Book Buddy", layout="wide")
+# ----------------------------
+# PAGE CONFIG
+# ----------------------------
+st.set_page_config(page_title="BookBuddy AI", layout="wide")
 
-st.title("📚 AI Book Buddy – NLP Recommender")
-st.write("Find the most relevant academic books using AI")
+st.title("📚 BookBuddy AI")
+st.write("Discover the Perfect Book for Your Learning Journey")
 
-# 🔐 Get API Key from Streamlit Secrets
-API_KEY = st.secrets["GOOGLE_API_KEY"]
+# ----------------------------
+# LOAD DATA
+# ----------------------------
+@st.cache_data
+def load_data():
+    df = pd.read_csv("books_dataset.csv")   # make sure file name matches
+    return df
 
-# -----------------------------
-# USER INPUT
-# -----------------------------
-subject = st.text_input("Enter Subject (e.g., Machine Learning)")
+df = load_data()
 
-# -----------------------------
-# FETCH BOOKS FUNCTION
-# -----------------------------
-def fetch_books(query):
-    url = "https://www.googleapis.com/books/v1/volumes"
-    params = {
-        "q": query,
-        "maxResults": 30,
-        "key": API_KEY
-    }
+# Clean column names (important)
+df.columns = df.columns.str.strip()
 
-    response = requests.get(url, params=params)
+# Convert to lowercase for safe filtering
+df["title"] = df["title"].astype(str)
+df["skill_level"] = df["skill_level"].astype(str)
+df["category"] = df["category"].astype(str)
 
-    if response.status_code != 200:
-        return pd.DataFrame()
+df["skill_level"] = df["skill_level"].str.lower()
+df["category"] = df["category"].str.lower()
 
-    data = response.json()
-    books = []
+# ----------------------------
+# SEARCH SECTION
+# ----------------------------
+st.subheader("🔎 Search Books")
 
-    if "items" in data:
-        for item in data["items"]:
-            volume = item["volumeInfo"]
+col1, col2, col3 = st.columns(3)
 
-            books.append({
-                "title": volume.get("title", ""),
-                "authors": ", ".join(volume.get("authors", ["Unknown"])),
-                "description": volume.get("description", ""),
-                "rating": volume.get("averageRating", 0),
-                "thumbnail": volume.get("imageLinks", {}).get("thumbnail", "")
-            })
+with col1:
+    search_query = st.text_input("Search by Title")
 
-    return pd.DataFrame(books)
+with col2:
+    selected_level = st.selectbox(
+        "Skill Level",
+        sorted(df["skill_level"].unique())
+    )
 
-# -----------------------------
-# MAIN SEARCH LOGIC
-# -----------------------------
-if st.button("Search Books"):
+with col3:
+    selected_category = st.selectbox(
+        "Category",
+        sorted(df["category"].unique())
+    )
 
-    if subject.strip() == "":
-        st.warning("Please enter a subject")
-    else:
-        df = fetch_books(subject)
+# ----------------------------
+# FILTER LOGIC
+# ----------------------------
+filtered_df = df.copy()
 
-        if df.empty:
-            st.error("No books found")
-        else:
-            # Combine title and description
-            df["content"] = df["title"] + " " + df["description"]
+# Search filter (partial match safe)
+if search_query:
+    filtered_df = filtered_df[
+        filtered_df["title"].str.contains(search_query, case=False, na=False)
+    ]
 
-            corpus = df["content"].tolist()
-            corpus.append(subject)
+# Skill level filter
+if selected_level:
+    filtered_df = filtered_df[
+        filtered_df["skill_level"] == selected_level.lower()
+    ]
 
-            # TF-IDF Vectorization
-            vectorizer = TfidfVectorizer(stop_words="english")
-            tfidf_matrix = vectorizer.fit_transform(corpus)
+# Category filter
+if selected_category:
+    filtered_df = filtered_df[
+        filtered_df["category"] == selected_category.lower()
+    ]
 
-            # Cosine Similarity
-            similarity_scores = cosine_similarity(
-                tfidf_matrix[-1], tfidf_matrix[:-1]
-            ).flatten()
+# ----------------------------
+# RESULTS
+# ----------------------------
+st.markdown("---")
+st.subheader("📖 Recommended Books")
 
-            df["similarity"] = similarity_scores
+if filtered_df.empty:
+    st.warning("No books found. Try another search.")
+else:
+    for index, row in filtered_df.iterrows():
+        with st.container():
+            st.markdown(f"### {row['title']}")
+            st.write(f"**Author:** {row.get('author', 'Unknown')}")
+            st.write(f"**Skill Level:** {row['skill_level'].capitalize()}")
+            st.write(f"**Category:** {row['category'].capitalize()}")
+            st.markdown("---")
 
-            # Final ranking score (Similarity + Rating weight)
-            df["final_score"] = df["similarity"] + (df["rating"] / 5) * 0.2
-
-            df = df.sort_values(by="final_score", ascending=False).head(5)
-
-            st.subheader("📖 Top Recommended Books")
-
-            for _, row in df.iterrows():
-                with st.container():
-                    col1, col2 = st.columns([1, 3])
-
-                    with col1:
-                        if row["thumbnail"]:
-                            st.image(row["thumbnail"])
-
-                    with col2:
-                        st.markdown(f"### {row['title']}")
-                        st.write(f"**Author:** {row['authors']}")
-                        st.write(f"⭐ Rating: {row['rating']}")
-                        st.write(row["description"][:300] + "...")
-
-                    st.markdown("---")
-
-st.markdown("Built by Prachi | Mini Project | NLP Recommendation System")
+# ----------------------------
+# FOOTER
+# ----------------------------
+st.markdown("Built by Prachi (Data Science Student)")
