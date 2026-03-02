@@ -1,0 +1,49 @@
+book_id,title,author,subject,topics,difficulty,best_for,depth_score,math_level,programming_level,avg_rating,pages
+1,Introduction to Algorithms,Cormen et al,DSA,"sorting,graphs,dynamic programming,greedy,complexity",Advanced,Research,5,5,4,4.5,1312
+2,Grokking Algorithms,Aditya Bhargava,DSA,"sorting,graphs,recursion,big O,searching",Beginner,Conceptual,2,2,2,4.6,256
+3,Data Structures and Algorithms Made Easy,Narasimha Karumanchi,DSA,"linked list,stack,queue,tree,graph",Intermediate,Exam,3,3,3,4.3,700
+4,Algorithms,Robert Sedgewick,DSA,"searching,sorting,graphs,trees",Intermediate,Conceptual,4,4,4,4.4,955
+5,Algorithm Design Manual,Steven Skiena,DSA,"design techniques,graphs,complexity",Advanced,Competitive,5,4,4,4.5,730
+6,Cracking the Coding Interview,Gayle Laakmann McDowell,DSA,"arrays,strings,trees,interview problems",Intermediate,Competitive,3,3,3,4.6,687
+
+7,Hands-On Machine Learning,Aurélien Géron,Machine Learning,"regression,classification,neural networks,deep learning",Intermediate,Practical,4,3,4,4.7,800
+8,Pattern Recognition and Machine Learning,Christopher Bishop,Machine Learning,"bayesian inference,probability,graphical models",Advanced,Research,5,5,3,4.5,738
+9,Machine Learning,Tom Mitchell,Machine Learning,"concept learning,decision trees,reinforcement learning",Intermediate,Conceptual,4,4,3,4.2,414
+10,Deep Learning,Ian Goodfellow,Machine Learning,"neural networks,cnn,rnn,optimization",Advanced,Research,5,5,4,4.6,775
+11,Python Machine Learning,Sebastian Raschka,Machine Learning,"classification,clustering,model evaluation",Intermediate,Practical,4,3,4,4.5,622
+12,Understanding Machine Learning,Shai Shalev-Shwartz,Machine Learning,"theory,svm,learning theory",Advanced,Research,5,5,3,4.4,410
+
+13,Database System Concepts,Silberschatz,DBMS,"sql,transactions,indexing,normalization",Intermediate,Exam,4,3,3,4.3,1376
+14,Fundamentals of Database Systems,Elmasri & Navathe,DBMS,"er model,sql,normalization,transactions",Intermediate,Conceptual,4,3,3,4.2,1200
+15,Sams Teach Yourself SQL in 10 Minutes,Ben Forta,DBMS,"sql,queries,joins",Beginner,Quick Revision,2,1,2,4.4,256
+16,SQL Performance Explained,Markus Winand,DBMS,"indexing,optimization,query performance",Advanced,Practical,4,2,3,4.6,300
+
+17,Operating System Concepts,Silberschatz,Operating Systems,"processes,threads,memory,deadlocks",Advanced,Exam,5,4,3,4.3,976
+18,Modern Operating Systems,Andrew Tanenbaum,Operating Systems,"process scheduling,distributed systems",Advanced,Conceptual,5,4,3,4.4,1136
+19,Operating Systems Three Easy Pieces,Remzi Arpaci-Dusseau,Operating Systems,"virtualization,concurrency,persistence",Intermediate,Conceptual,4,3,3,4.7,500
+20,OS Concepts Essentials,Silberschatz,Operating Systems,"basics,process management,memory",Beginner,Exam,3,2,2,4.1,600
+
+21,Computer Networking A Top Down Approach,Kurose & Ross,Computer Networks,"tcp/ip,routing,http,application layer",Intermediate,Conceptual,4,3,3,4.6,864
+22,Computer Networks,Andrew Tanenbaum,Computer Networks,"protocols,architecture,routing",Advanced,Research,5,4,3,4.4,960
+23,Data Communications and Networking,Behrouz Forouzan,Computer Networks,"osi model,lan,wan,error control",Intermediate,Exam,4,3,3,4.2,1184
+24,Network Security Essentials,William Stallings,Computer Networks,"encryption,authentication,firewalls",Intermediate,Competitive,4,3,3,4.3,480
+
+25,Discrete Mathematics and Its Applications,Kenneth Rosen,Mathematics,"logic,combinatorics,graph theory,proofs",Advanced,Exam,5,5,1,4.2,1072
+26,Introduction to Probability,Blitzstein & Hwang,Mathematics,"probability,random variables,statistics",Advanced,Research,5,5,1,4.5,596
+27,Linear Algebra and Its Applications,Gilbert Strang,Mathematics,"vectors,matrix,eigenvalues",Intermediate,Conceptual,4,4,1,4.6,560
+28,Engineering Mathematics,K.A. Stroud,Mathematics,"calculus,differential equations",Intermediate,Exam,4,4,1,4.1,1000
+
+29,Clean Code,Robert C. Martin,Software Engineering,"code quality,design principles,testing",Intermediate,Practical,4,2,4,4.7,464
+30,Design Patterns,Erich Gamma,Software Engineering,"oop patterns,architecture",Advanced,Conceptual,5,2,5,4.5,395
+31,Refactoring,Martin Fowler,Software Engineering,"code improvement,design",Advanced,Practical,5,2,5,4.6,448
+32,The Pragmatic Programmer,Andrew Hunt,Software Engineering,"best practices,career growth",Beginner,Conceptual,3,1,3,4.7,352
+
+33,Artificial Intelligence A Modern Approach,Stuart Russell,AI,"search,logic,planning,ml",Advanced,Research,5,5,4,4.5,1152
+34,Reinforcement Learning An Introduction,Richard Sutton,AI,"mdp,q-learning,policy gradients",Advanced,Research,5,5,4,4.6,552
+35,Speech and Language Processing,Jurafsky & Martin,AI,"nlp,language models,parsing",Advanced,Research,5,4,4,4.4,912
+36,Computer Vision Algorithms and Applications,Richard Szeliski,AI,"image processing,cnn,vision models",Advanced,Research,5,4,4,4.5,812
+
+37,Introduction to the Theory of Computation,Michael Sipser,Theory,"automata,turing machines,complexity",Advanced,Research,5,5,2,4.5,504
+38,Compilers Principles Techniques and Tools,Aho et al,Theory,"parsing,lexical analysis,optimization",Advanced,Research,5,4,4,4.4,1000
+39,System Design Interview,Alex Xu,System Design,"scalability,architecture,distributed systems",Intermediate,Competitive,4,3,4,4.6,322
+40,Head First Design Patterns,Eric Freeman,Software Engineering,"design patterns,oops",Beginner,Conceptual,3,1,3,4.5,694
