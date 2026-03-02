@@ -6,10 +6,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 st.set_page_config(page_title="AI Book Buddy", layout="wide")
 
-st.title("📚 AI Book Buddy – NLP Based Recommender")
+st.title("📚 AI Book Buddy – NLP Recommender")
 st.write("Find the most relevant academic books using AI")
 
-# 🔐 Secure API Key from Streamlit Secrets
+# 🔐 Get API Key from Streamlit Secrets
 API_KEY = st.secrets["GOOGLE_API_KEY"]
 
 # -----------------------------
@@ -18,7 +18,7 @@ API_KEY = st.secrets["GOOGLE_API_KEY"]
 subject = st.text_input("Enter Subject (e.g., Machine Learning)")
 
 # -----------------------------
-# FETCH BOOKS FROM API
+# FETCH BOOKS FUNCTION
 # -----------------------------
 def fetch_books(query):
     url = "https://www.googleapis.com/books/v1/volumes"
@@ -31,7 +31,6 @@ def fetch_books(query):
     response = requests.get(url, params=params)
 
     if response.status_code != 200:
-        st.error("Error fetching data from Google Books API")
         return pd.DataFrame()
 
     data = response.json()
@@ -52,7 +51,7 @@ def fetch_books(query):
     return pd.DataFrame(books)
 
 # -----------------------------
-# SEARCH LOGIC
+# MAIN SEARCH LOGIC
 # -----------------------------
 if st.button("Search Books"):
 
@@ -64,24 +63,24 @@ if st.button("Search Books"):
         if df.empty:
             st.error("No books found")
         else:
-            # Combine title + description
+            # Combine title and description
             df["content"] = df["title"] + " " + df["description"]
 
-            # Add user query for similarity comparison
             corpus = df["content"].tolist()
             corpus.append(subject)
 
-            # TF-IDF
+            # TF-IDF Vectorization
             vectorizer = TfidfVectorizer(stop_words="english")
             tfidf_matrix = vectorizer.fit_transform(corpus)
 
+            # Cosine Similarity
             similarity_scores = cosine_similarity(
                 tfidf_matrix[-1], tfidf_matrix[:-1]
             ).flatten()
 
             df["similarity"] = similarity_scores
 
-            # Add rating weight
+            # Final ranking score (Similarity + Rating weight)
             df["final_score"] = df["similarity"] + (df["rating"] / 5) * 0.2
 
             df = df.sort_values(by="final_score", ascending=False).head(5)
