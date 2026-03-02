@@ -1,152 +1,126 @@
 import streamlit as st
 import requests
-import pandas as pd
-import math
 
-# ----------------------------
+# -----------------------
 # PAGE CONFIG
-# ----------------------------
+# -----------------------
 st.set_page_config(page_title="BookBuddy AI", layout="wide")
 
-# ----------------------------
-# PURPLE UI STYLING
-# ----------------------------
+# -----------------------
+# CUSTOM PURPLE UI
+# -----------------------
 st.markdown("""
-<style>
-.main {
-    background-color: #0e1117;
-}
-.header-box {
-    background: linear-gradient(90deg, #6a5acd, #9370db);
-    padding: 40px;
-    border-radius: 15px;
-    text-align: center;
-}
-.header-box h1 {
-    color: white;
-    font-size: 40px;
-}
-.header-box p {
-    color: #f0f0f0;
-}
-.book-card {
-    background-color: #1c1f26;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# Header
-st.markdown("""
-<div class="header-box">
-<h1>📚 BookBuddy AI</h1>
-<p>Discover the Perfect Book for Your Learning Journey</p>
-</div>
-""", unsafe_allow_html=True)
-
-st.write("")
-
-# 🔐 Secure API Key
-API_KEY = st.secrets["GOOGLE_API_KEY"]
-
-# ----------------------------
-# INPUT SECTION
-# ----------------------------
-col1, col2 = st.columns([3, 1])
-
-with col1:
-    subject = st.text_input("Search Books")
-
-with col2:
-    skill_level = st.selectbox("Skill Level", ["Beginner", "Intermediate", "Advanced"])
-
-# ----------------------------
-# FETCH BOOKS
-# ----------------------------
-def fetch_books(query):
-    url = "https://www.googleapis.com/books/v1/volumes"
-    params = {
-        "q": query,
-        "maxResults": 30,
-        "key": API_KEY
+    <style>
+    body {
+        background-color: #0e1117;
+        color: white;
     }
 
-    response = requests.get(url, params=params)
+    .main-title {
+        background: linear-gradient(90deg, #7b2ff7, #9b59b6);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+        color: white;
+    }
 
-    if response.status_code != 200:
-        return pd.DataFrame()
+    .subtitle {
+        text-align: center;
+        color: #ddd;
+        margin-bottom: 30px;
+    }
 
+    .book-card {
+        background-color: #1c1f26;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        border-left: 5px solid #9b59b6;
+    }
+
+    .footer {
+        margin-top: 40px;
+        text-align: center;
+        color: #aaa;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# -----------------------
+# HEADER
+# -----------------------
+st.markdown('<div class="main-title">📚 BookBuddy AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Discover the Perfect Book for Your Learning Journey</div>', unsafe_allow_html=True)
+
+# -----------------------
+# INPUT SECTION
+# -----------------------
+col1, col2 = st.columns([3,1])
+
+with col1:
+    topic = st.text_input("Search Books")
+
+with col2:
+    level = st.selectbox("Skill Level", ["Beginner", "Intermediate", "Advanced"])
+
+search_button = st.button("🔍 Search")
+
+# -----------------------
+# SEARCH LOGIC
+# -----------------------
+if search_button and topic:
+
+    # Smart query including level
+    search_query = f"{topic} {level} programming textbook"
+
+    url = f"https://www.googleapis.com/books/v1/volumes?q={search_query}&maxResults=10"
+
+    response = requests.get(url)
     data = response.json()
-    books = []
 
-    if "items" in data:
-        for item in data["items"]:
-            volume = item.get("volumeInfo", {})
+    books = data.get("items", [])
 
-            books.append({
-                "title": volume.get("title", ""),
-                "authors": ", ".join(volume.get("authors", ["Unknown"])),
-                "description": volume.get("description", ""),
-                "rating": volume.get("averageRating", 0),
-                "thumbnail": volume.get("imageLinks", {}).get("thumbnail", "")
+    study_books = []
+
+    for item in books:
+        info = item.get("volumeInfo", {})
+        title = info.get("title", "No Title")
+        categories = info.get("categories", [])
+        description = info.get("description", "")
+
+        # Filter out fiction
+        if "fiction" not in str(categories).lower():
+
+            study_books.append({
+                "title": title,
+                "description": description
             })
 
-    return pd.DataFrame(books)
+        if len(study_books) == 5:
+            break
 
-# ----------------------------
-# SIMPLE NLP SCORING (NO SKLEARN)
-# ----------------------------
-def calculate_score(row, query):
-    score = 0
-    query_words = query.lower().split()
+    # -----------------------
+    # DISPLAY RESULTS
+    # -----------------------
+    if study_books:
+        for book in study_books:
 
-    content = (row["title"] + " " + row["description"]).lower()
+            st.markdown(f"""
+            <div class="book-card">
+                <h4>{book['title']}</h4>
+                <p><b>Why helpful?</b><br>
+                {book['description'][:300] if book['description'] else "Covers important concepts for structured learning and practical understanding."}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    for word in query_words:
-        score += content.count(word)
-
-    rating_weight = (row["rating"] / 5) if row["rating"] else 0
-
-    return score + rating_weight
-
-# ----------------------------
-# SEARCH BUTTON
-# ----------------------------
-if st.button("🔍 Search"):
-
-    if subject.strip() == "":
-        st.warning("Please enter a subject")
     else:
-        df = fetch_books(subject)
+        st.error("No study books found. Try another topic.")
 
-        if df.empty:
-            st.error("No books found")
-        else:
-            df["score"] = df.apply(lambda row: calculate_score(row, subject), axis=1)
-            df = df.sort_values(by="score", ascending=False).head(5)
-
-            st.write("")
-            st.subheader("Top 5 Recommended Books")
-
-            for _, row in df.iterrows():
-                st.markdown('<div class="book-card">', unsafe_allow_html=True)
-
-                col1, col2 = st.columns([1, 3])
-
-                with col1:
-                    if row["thumbnail"]:
-                        st.image(row["thumbnail"])
-
-                with col2:
-                    st.markdown(f"### {row['title']}")
-                    st.write(f"**Author:** {row['authors']}")
-                    st.write(f"⭐ Rating: {row['rating']}")
-                    st.write(row["description"][:300] + "...")
-
-                st.markdown('</div>', unsafe_allow_html=True)
-
-st.write("")
-st.markdown("Built by Prachi | AI Mini Project")
+# -----------------------
+# FOOTER
+# -----------------------
+st.markdown('<div class="footer">Built by Prachi | AI Mini Project 💜</div>', unsafe_allow_html=True)
 
